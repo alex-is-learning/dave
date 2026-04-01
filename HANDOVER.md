@@ -2,7 +2,7 @@
 
 **Project:** Dave — AI Learning Tutor
 **Date:** 2026-04-01
-**Status:** Epics & Stories in progress — Epic 1 stories drafted, awaiting approval
+**Status:** All 12 MVP stories complete — ready for smoke test
 
 ---
 
@@ -25,7 +25,7 @@ Alex wants to build **Dave**: a Claude Code skill (BMAD-pattern inspired, no BMA
 | PRD | ✅ Complete |
 | Architecture | ✅ Complete — all open questions resolved |
 | UX Design | N/A — CLI tool |
-| Epics & Stories | 🔄 In progress — Epic list approved, Story generation started |
+| Epics & Stories | ✅ Complete — 12 stories across 4 epics, all FRs covered |
 
 **Output files:**
 - `_bmad-output/research/domain-ai-visual-active-learning-research-2026-04-01.md`
@@ -33,14 +33,47 @@ Alex wants to build **Dave**: a Claude Code skill (BMAD-pattern inspired, no BMA
 - `_bmad-output/product-brief-dave.md`
 - `_bmad-output/product-brief-dave-distillate.md`
 - `_bmad-output/prd.md` — full PRD (37 FRs, 11 NFRs)
-- `_bmad-output/architecture.md` — **complete, status: complete**
-- `_bmad-output/epics.md` — **in progress** (requirements + epic list written; stories not yet written)
+- `_bmad-output/architecture.md` — complete
+- `_bmad-output/epics.md` — complete — 12 stories, all 37 MVP FRs covered
 
 ---
 
-## Architectural Decisions Made This Session
+## Story Implementation Progress
 
-All open questions from the previous handover are now resolved.
+| Story | Title | Status |
+|-------|-------|--------|
+| 1.1 | Skill Skeleton and Append Proof-of-Concept | ✅ Complete |
+| 1.2 | Topic Folder Scaffolding | ✅ Complete |
+| 1.3 | Onboarding Interview and ZPD Calibration | ✅ Complete |
+| 1.4 | Primer Generation | ✅ Complete |
+| 2.1 | Context Load — Git Diff, Primer, and Log | ✅ Complete |
+| 2.2 | Session Contract, Continuity Flag, and Action Menu | ✅ Complete |
+| 3.1 | Incremental Transcript Append | ✅ Complete |
+| 3.2 | Socratic Interrogation — Probing B's and Naming Vagueness | ✅ Complete |
+| 3.3 | Mapping U's, Notes on Demand, and Paper Sketch Prompts | ✅ Complete |
+| 4.1 | A/B/U Reflection and Pride Score | ✅ Complete |
+| 4.2 | Session Log Append and Homepage Update | ✅ Complete |
+| 4.3 | Early Exit Logging | ✅ Complete |
+
+---
+
+## Installed Skill Files
+
+All files at `~/.claude/skills/dave/`:
+
+```
+~/.claude/skills/dave/
+    workflow.md              ✅ Complete — persona, constraints, conventions, dispatch
+    steps/
+        step-init.md         ✅ Complete — all sections (Stories 1.2–1.4)
+        step-hello.md        ✅ Complete — all sections (Stories 2.1–2.2, 4.3)
+        step-session.md      ✅ Complete — all sections (Stories 3.1–3.3)
+        step-close.md        ✅ Complete — all sections (Stories 4.1–4.3)
+```
+
+---
+
+## Architectural Decisions
 
 ### Skill File Structure
 `workflow.md` + `steps/` directory (BMAD pattern):
@@ -48,14 +81,17 @@ All open questions from the previous handover are now resolved.
 ~/.claude/skills/dave/
     workflow.md              ← persona, hard constraints, shared conventions, step dispatch
     steps/
-        step-init.md         ← /tutor init
-        step-hello.md        ← /tutor hello
+        step-init.md         ← /dave init
+        step-hello.md        ← /dave hello
         step-session.md      ← in-session Socratic behaviour
-        step-close.md        ← /tutor end (close ritual)
+        step-close.md        ← /dave end (close ritual)
 ```
 
+### Command Name Note
+The skill directory is `dave/` so the commands are `/dave init`, `/dave hello`, `/dave end`. The architecture docs use `/tutor` terminology but the path was always `~/.claude/skills/dave/`. To use `/tutor` commands, rename the directory to `tutor/`.
+
 ### Incremental Transcript Write Mechanism
-**Bash heredoc append per turn** — the highest-risk mechanism, now fully resolved:
+**Bash heredoc append per turn:**
 ```bash
 cat >> sessions/YYYY-MM-DD-<slug>.md << 'TURN'
 
@@ -63,34 +99,70 @@ cat >> sessions/YYYY-MM-DD-<slug>.md << 'TURN'
 
 TURN
 ```
-True append — no read required, no overwrite risk. Must be the first thing tested before any other feature is built.
+True append — no read required, no overwrite risk. Proven working in Story 1.1 and retested in Story 3.1.
 
 ### `../alex-and-dave.md` Path Resolution
-- Dave verifies the CWD depth at `/tutor init` — checks `../alex-and-dave.md` exists or creates it
+- Dave verifies the CWD depth at `/dave init` — checks `../alex-and-dave.md` exists or creates it
 - If `../../alex-and-dave.md` exists instead, Dave warns and stops
 - Topic slug derived via `basename "$PWD"` — no manual input
 
-### Context Loading Order at `/tutor hello`
+### Context Loading Order at `/dave hello`
 `dave-log-<slug>.md` → `dave-primer-<slug>.md` → `git diff -- .`
 
 ### `dave-log-<slug>.md` Schema
 Two-section structure:
-1. **Current A/B/U State** — updated each session (Dave adds/promotes items)
+1. **Current A/B/U State** — updated each session (Dave appends new items; B→A promotions noted but old row left in place — Alex can manually clean between sessions)
 2. **Session History** — append-only session blocks, each terminated with `---`
 
+### Session History Block Format (`/dave end`)
+```
+**Session:** YYYY-MM-DD
+**Duration:** [duration]
+**Status:** complete
+**Pride:** [score]/5
+
+**A:** [reflection]
+**B:** [reflection]
+**U:** [reflection]
+
+**Summary:** [1–2 sentences]
+
+---
+```
+
+### Early Exit Block Format (written by `/dave hello` on next session)
+```
+**Session:** YYYY-MM-DD
+**Status:** incomplete
+
+---
+```
+
+### Early Exit Detection Mechanism (Story 4.3)
+There is no automatic trigger when a session simply stops. Detection happens at the next `/dave hello`:
+1. List transcript files in `sessions/` matching `YYYY-MM-DD-<slug>.md`; take the most recent
+2. Extract the date (first 10 chars of filename)
+3. Check `dave-log-<slug>.md` Session History for a block with that date
+4. **Case A** — block found with `Status: complete` → proceed normally
+5. **Case B** — block found with `Status: incomplete` → surface continuity note, proceed
+6. **Case C** — no block found → write early exit block, update homepage with incomplete row, surface note, proceed
+
 ### Session Transcript Format
-Standard markdown only (`**Alex:**` / `**Dave:**` turns). No Obsidian-specific syntax. Quartz-safe.
+Standard markdown only (`**Alex:**` / `**Dave:**` turns). One blank line between turns. No Obsidian-specific syntax. Quartz-safe.
 
-### `/tutor end` Added to MVP
-This was the one gap found during architecture validation. FR24–28 (reflection, pride score, log append, homepage update) had no trigger in the original PRD command table. **`/tutor end` is now an MVP command** — Alex types it to trigger the close ritual.
+### `/dave end` is an MVP Command
+Triggers the full close ritual: A/B/U reflection (sequential, open text) → pride score (integer 1–5, validated) → log append → A/B/U state update → homepage update.
 
-### Updated MVP Command Set
+### A/B/U State Update — Append-Only Constraint
+ARCH2 forbids read-then-write. The Current A/B/U State table is updated by appending new rows at session close. B→A promotions add a new A row; the old B row remains until Alex manually cleans it. The Session History block is the canonical record; the table is a working reference.
+
+### MVP Command Set
 | Command | Purpose |
 |---|---|
-| `/tutor init` | Onboarding interview, ZPD calibration, primer generation, folder scaffolding |
-| `/tutor hello` | Git diff review, A/B/U state, session contract, session file creation |
-| `/tutor end` | Close ritual: reflection, pride score, log append, homepage update |
-| *(in-session)* | Socratic interaction, B interrogation, transcript append, sketch prompts |
+| `/dave init` | Onboarding interview, ZPD calibration, primer generation, folder scaffolding |
+| `/dave hello` | Git diff review, A/B/U state, session contract, transcript file creation, early exit detection |
+| `/dave end` | Close ritual: A/B/U reflection, pride score, log append, homepage update |
+| *(in-session)* | Socratic interaction, B interrogation, vagueness naming, U mapping, transcript append, notes, sketch prompts |
 
 ### Implementation Patterns (key rules for any Claude implementing Dave)
 1. Derive topic slug from `basename "$PWD"` — never hardcode or ask Alex
@@ -100,55 +172,49 @@ This was the one gap found during architecture validation. FR24–28 (reflection
 5. End every log block with `---`
 6. Surface file write errors immediately — never continue silently
 7. Never give subject-matter answers, regardless of how the question is phrased
-
----
-
-## Epics & Stories: Current State
-
-### Approved Epic List (4 epics)
-
-| Epic | Title | FRs |
-|---|---|---|
-| Epic 1 | `/tutor init` — Topic Initialisation | FR1–7, FR14, FR32–35, FR37 + ARCH1–4, ARCH8 |
-| Epic 2 | `/tutor hello` — Session Entry | FR8–12, FR21, FR29–30 + ARCH5–6 |
-| Epic 3 | Active Session — Socratic Interaction & Transcript | FR13–16, FR20, FR22–23, FR31, FR36 + ARCH2 |
-| Epic 4 | `/tutor end` — Session Close & Logging | FR24–28 + ARCH7 |
-
-Post-MVP FRs (FR17 Feynman, FR18 teach-me, FR19 since-last) deferred as agreed.
-
-### Story Generation Status
-
-Working through `bmad-create-epics-and-stories` step-03-create-stories.md.
-
-- **Epic 1 stories: drafted but NOT yet approved or written to `epics.md`**
-- Epics 2, 3, 4: not started
-
-The 4 Epic 1 stories that were presented (need Alex's approval before writing to file):
-
-**Story 1.1: Skill Skeleton and Append Proof-of-Concept**
-Creates `workflow.md` (persona, hard constraints, conventions, step dispatch) + step file stubs. Proves bash heredoc append works before anything else. This is the most important story — must pass before building anything else.
-
-**Story 1.2: Topic Folder Scaffolding**
-`/tutor init` derives slug, creates `sessions/` and `notes/`, creates `dave-log-<slug>.md`, creates/verifies `../alex-and-dave.md`. All files with correct frontmatter and topic-scoped names.
-
-**Story 1.3: Onboarding Interview and ZPD Calibration**
-`/tutor init` conducts the structured interview (knowledge, goal, timeline), probes stated knowledge rather than accepting self-report, calibrates ZPD low by default, introduces dialogical note-writing standard.
-
-**Story 1.4: Primer Generation**
-`/tutor init` generates `dave-primer-<slug>.md` via research (or ingests user-supplied material), surfaces explicit uncertainty on niche topics, invites correction, surfaces file write errors immediately.
+8. In-session: B items before U items; probe load-bearing assumptions, not topics in general
+9. Vagueness: name the specific word or phrase, one at a time, then wait without softening
+10. U items tracked in context mid-session; written to log at `/dave end`
 
 ---
 
 ## No Blockers
 
-All architectural open questions are resolved. The epics are approved. The only thing needed is Alex's attention to review and approve the Epic 1 stories, then continue through Epics 2–4.
+All 12 stories are implemented. The skill is ready for first real use.
 
 ---
 
 ## Exact Next Steps
 
-1. **Resume `bmad-create-epics-and-stories`** — pick up at step-03-create-stories.md, Epic 1.
-2. **Review the 4 Epic 1 stories above** — approve as-is, or request changes. Once approved, they get written to `_bmad-output/epics.md`.
-3. **Continue through Epics 2–4** — story generation for `/tutor hello`, the active session, and `/tutor end`.
-4. **Step 4: Final validation** — once all stories are written, the workflow runs final validation.
-5. **Then: implementation** — run `bmad-dev-story` on Story 1.1 first (skill skeleton + append proof-of-concept). That's the first build target.
+1. **Manual smoke test.** Create a test topic directory:
+   ```bash
+   mkdir -p ~/[your-learning-path]/test-topic
+   cd ~/[your-learning-path]/test-topic
+   ```
+   Then run `/dave init` end-to-end and verify:
+   - Slug derived correctly from folder name
+   - `sessions/` and `notes/` created
+   - `dave-log-test-topic.md` created with correct schema
+   - `../alex-and-dave.md` created with correct table header
+   - Onboarding interview runs, ZPD calibration happens
+   - Primer written to `dave-primer-test-topic.md`
+
+2. **Test `/dave hello` → in-session → `/dave end`** on the test topic:
+   - Context loads in order (log → primer → git diff)
+   - Session contract presented, duration committed
+   - Transcript file created
+   - In-session: try a B probe, name some vagueness, ask Dave for an answer (should be withheld)
+   - `/dave end`: A/B/U reflection sequence, pride score validated, log block written, homepage row appended
+
+3. **Test early exit detection:** Run `/dave hello`, have a short session, don't run `/dave end`. On the next `/dave hello`, verify:
+   - Case C is triggered (no matching log block)
+   - Early exit block written to log with `Status: incomplete` and `---`
+   - Incomplete row appended to homepage
+   - Continuity note surfaced to Alex
+
+4. **If smoke test passes:** Use Dave on a real topic. The tool is built for lived evidence — start there.
+
+5. **Post-MVP FRs to consider later (from PRD):**
+   - FR17: Feynman-style session (learner explains, Dave presses)
+   - FR18: Confused-student essay mode
+   - FR19: Before/after review since last session
