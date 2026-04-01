@@ -2,7 +2,7 @@
 
 **Project:** Dave — AI Learning Tutor
 **Date:** 2026-04-01
-**Status:** All 12 MVP stories complete — ready for smoke test
+**Status:** All 12 MVP stories complete — active testing in scrapbook Obsidian vault
 
 ---
 
@@ -178,43 +178,14 @@ ARCH2 forbids read-then-write. The Current A/B/U State table is updated by appen
 
 ---
 
-## No Blockers
+## Current Status
 
-All 12 stories are implemented. The skill is ready for first real use.
+All 12 stories are implemented. Dave is now being tested inside the scrapbook Obsidian vault.
 
 ---
 
-## Exact Next Steps
+## Post-MVP FRs to consider later (from PRD)
 
-1. **Manual smoke test.** Create a test topic directory:
-   ```bash
-   mkdir -p ~/[your-learning-path]/test-topic
-   cd ~/[your-learning-path]/test-topic
-   ```
-   Then run `/dave init` end-to-end and verify:
-   - Slug derived correctly from folder name
-   - `sessions/` and `notes/` created
-   - `dave-log-test-topic.md` created with correct schema
-   - `../alex-and-dave.md` created with correct table header
-   - Onboarding interview runs, ZPD calibration happens
-   - Primer written to `dave-primer-test-topic.md`
-
-2. **Test `/dave hello` → in-session → `/dave end`** on the test topic:
-   - Context loads in order (log → primer → git diff)
-   - Session contract presented, duration committed
-   - Transcript file created
-   - In-session: try a B probe, name some vagueness, ask Dave for an answer (should be withheld)
-   - `/dave end`: A/B/U reflection sequence, pride score validated, log block written, homepage row appended
-
-3. **Test early exit detection:** Run `/dave hello`, have a short session, don't run `/dave end`. On the next `/dave hello`, verify:
-   - Case C is triggered (no matching log block)
-   - Early exit block written to log with `Status: incomplete` and `---`
-   - Incomplete row appended to homepage
-   - Continuity note surfaced to Alex
-
-4. **If smoke test passes:** Use Dave on a real topic. The tool is built for lived evidence — start there.
-
-5. **Post-MVP FRs to consider later (from PRD):**
-   - FR17: Feynman-style session (learner explains, Dave presses)
-   - FR18: Confused-student essay mode
-   - FR19: Before/after review since last session
+- FR17: Feynman-style session (learner explains, Dave presses)
+- FR18: Confused-student essay mode
+- FR19: Before/after review since last session
