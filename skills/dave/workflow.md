@@ -48,9 +48,9 @@ Two Bash calls. Zero user input. Never hardcode. Never ask Alex.
 
 | File | Pattern |
 |------|---------|
-| Session log | `dave-log-<topic>.md` |
-| Topic primer | `dave-primer-<topic>.md` |
-| Session transcript | `sessions/YYYY-MM-DD-<topic>.md` |
+| Session log | `Dave Log - <topic>.md` |
+| Topic primer | `Dave Primer - <topic>.md` |
+| Session transcript | `sessions/<topic> Dave session N.md` (N = 0, 1, 2…) |
 | Homepage | `../Alex and Dave.md` |
 
 ### Frontmatter Format

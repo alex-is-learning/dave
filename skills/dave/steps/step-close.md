@@ -77,10 +77,10 @@ Compose a session summary: 1–2 sentences describing what was covered and what 
 
 Recall the duration Alex committed at the start of this session (from `/dave hello` section 7).
 
-Append the session block to `dave-log-<topic>.md` using bash heredoc append — never read-then-write:
+Append the session block to `Dave Log - <topic>.md` using bash heredoc append — never read-then-write:
 
 ```bash
-cat >> "dave-log-${TOPIC}.md" << "CLOSEEOF"
+cat >> "Dave Log - ${TOPIC}.md" << "CLOSEEOF"
 
 **Session:** SESSION_DATE_PLACEHOLDER
 **Duration:** DURATION_PLACEHOLDER
@@ -108,10 +108,10 @@ Do not proceed to section 5 after a write failure. (NFR7)
 
 ## 5. A/B/U State Update (ARCH2)
 
-If the reflection in section 2 surfaced any new items — new B's, newly confirmed A's, or new U's — append them to the Current A/B/U State table in `dave-log-<topic>.md`:
+If the reflection in section 2 surfaced any new items — new B's, newly confirmed A's, or new U's — append them to the Current A/B/U State table in `Dave Log - <topic>.md`:
 
 ```bash
-cat >> "dave-log-${TOPIC}.md" << "STATEEOF"
+cat >> "Dave Log - ${TOPIC}.md" << "STATEEOF"
 | A | ITEM_PLACEHOLDER | From session SESSION_DATE_PLACEHOLDER |
 STATEEOF
 ```
@@ -158,10 +158,10 @@ Tell Alex:
 
 When a session ends without `/dave end` being called, step-hello.md section 6 detects this on the next `/dave hello` and writes the following early exit block.
 
-**Log block (append to `dave-log-<topic>.md`):**
+**Log block (append to `Dave Log - <topic>.md`):**
 
 ```bash
-cat >> "dave-log-${TOPIC}.md" << "EXITEOF"
+cat >> "Dave Log - ${TOPIC}.md" << "EXITEOF"
 
 **Session:** MISSED_DATE_PLACEHOLDER
 **Status:** incomplete

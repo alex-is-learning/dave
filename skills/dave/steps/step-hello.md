@@ -19,10 +19,10 @@ Store `SLUG` and `TOPIC`. NEVER ask Alex for them. NEVER hardcode them.
 
 ---
 
-## 2. Load `dave-log-<topic>.md`
+## 2. Load `Dave Log - <topic>.md`
 
 ```bash
-[ -f "dave-log-${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
+[ -f "Dave Log - ${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
 ```
 
 **If the log exists:** read it in full. You will use it in sections 3 and 5.
@@ -31,7 +31,7 @@ Store `SLUG` and `TOPIC`. NEVER ask Alex for them. NEVER hardcode them.
 
 ```bash
 TODAY=$(date '+%Y-%m-%dT%H:%M')
-cat > "dave-log-${TOPIC}.md" << LOGEOF
+cat > "Dave Log - ${TOPIC}.md" << LOGEOF
 ---
 date: ${TODAY}
 tags: [Dave]
@@ -63,7 +63,7 @@ Then continue with section 3.
 
 ## 3. Parse the Current A/B/U State
 
-From the `dave-log-<topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
+From the `Dave Log - <topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
 
 - **A** — new learnings that seem true and useful, but not yet empirically backed; prime targets for Socratic interrogation
 - **B** — A items that have since received empirical backing; more settled
@@ -75,17 +75,17 @@ If the table is empty (first session or no entries yet): note that the A/B/U sta
 
 ---
 
-## 4. Load `dave-primer-<topic>.md`
+## 4. Load `Dave Primer - <topic>.md`
 
 ```bash
-[ -f "dave-primer-${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
+[ -f "Dave Primer - ${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
 ```
 
 **If the primer exists:** read it in full. This is your primary knowledge source for the session. Do not surface its contents to Alex — use it to inform your questions, calibrate depth, and assess Alex's claims.
 
 **If the primer is missing:** warn Alex and stop:
 
-> `dave-primer-${TOPIC}.md` is missing. This usually means `/dave init` hasn't been run for this topic yet, or the primer was moved or deleted.
+> `Dave Primer - ${TOPIC}.md` is missing. This usually means `/dave init` hasn't been run for this topic yet, or the primer was moved or deleted.
 >
 > Please run `/dave init` first to generate the primer, then return here.
 
@@ -132,43 +132,38 @@ Note the error briefly and continue — do not stop the session:
 
 This section detects sessions that ended without `/dave end` and records them before proceeding.
 
-### 6a. Find the most recent transcript
+### 6a. Count session files vs log entries
 
 ```bash
-ls sessions/ 2>/dev/null | grep "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-${TOPIC}\.md$" | sort | tail -1
+FILE_COUNT=$(ls sessions/ 2>/dev/null | grep -c "^${TOPIC} Dave session " || echo 0)
+LOG_COUNT=$(grep -c "^\*\*Session:\*\*" "Dave Log - ${TOPIC}.md" 2>/dev/null || echo 0)
 ```
 
-If `sessions/` is empty or does not exist: no previous session → skip to section 7.
+If `FILE_COUNT` is 0: no previous sessions → skip to section 7.
 
-Extract the date from the filename: the first 10 characters (`YYYY-MM-DD`). Store as `LAST_TRANSCRIPT_DATE`.
+### 6b. Compare counts and check last log block
 
-### 6b. Check for a matching log block
-
-From the `dave-log-<slug>.md` you read in section 2, look at the **"## Session History"** section. Search for a block containing `**Session:** ${LAST_TRANSCRIPT_DATE}`.
-
-**Case A — Matching block found with `**Status:** complete`:**
+**Case A — `FILE_COUNT == LOG_COUNT` and last log block has `Status: complete`:**
 All good. Continue to section 7 without comment.
 
-**Case B — Matching block found with `**Status:** incomplete`:**
+**Case B — `FILE_COUNT == LOG_COUNT` and last log block has `Status: incomplete`:**
 The early exit was already recorded. Tell Alex:
 
 > Your last session on **${TOPIC}** ended without a close ritual — no reflection was captured. Just so you know.
 
 Then continue to section 7.
 
-**Case C — No matching block found for `${LAST_TRANSCRIPT_DATE}`:**
-A session was never closed. Write the early exit block and homepage row now (Story 4.3), then surface the note.
+**Case C — `FILE_COUNT > LOG_COUNT`:**
+A session was never closed. Find the unclosed transcript and extract its date from frontmatter:
 
-Derive topic and missed date:
 ```bash
-SLUG=$(basename "$PWD")
-TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
-MISSED_DATE=LAST_TRANSCRIPT_DATE_VALUE
+LAST_FILE=$(ls sessions/ 2>/dev/null | grep "^${TOPIC} Dave session " | sort | tail -1)
+MISSED_DATE=$(head -5 "sessions/${LAST_FILE}" | grep "^date:" | sed 's/date: //' | cut -c1-10)
 ```
 
-Append early exit block to `dave-log-${TOPIC}.md`:
+Append early exit block to `Dave Log - ${TOPIC}.md`:
 ```bash
-cat >> "dave-log-${TOPIC}.md" << "EXITEOF"
+cat >> "Dave Log - ${TOPIC}.md" << "EXITEOF"
 
 **Session:** MISSED_DATE_PLACEHOLDER
 **Status:** incomplete
@@ -220,9 +215,10 @@ Create the session transcript file using bash heredoc append (never read-then-wr
 ```bash
 SLUG=$(basename "$PWD")
 TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
-TODAY_DATE=$(date '+%Y-%m-%d')
 TODAY_FULL=$(date '+%Y-%m-%dT%H:%M')
-TRANSCRIPT="sessions/${TODAY_DATE}-${TOPIC}.md"
+TODAY_DATE=$(date '+%Y-%m-%d')
+SESSION_N=$(ls sessions/ 2>/dev/null | grep -c "^${TOPIC} Dave session " || echo 0)
+TRANSCRIPT="sessions/${TOPIC} Dave session ${SESSION_N}.md"
 
 cat >> "${TRANSCRIPT}" << 'SESSEOF'
 ---
@@ -230,7 +226,7 @@ date: TODAY_FULL_PLACEHOLDER
 tags: [Dave]
 ---
 
-# Session: TODAY_DATE_PLACEHOLDER
+# TODAY_DATE_PLACEHOLDER
 
 **Topic:** TOPIC_PLACEHOLDER
 
@@ -241,7 +237,7 @@ SESSEOF
 
 Replace `TODAY_FULL_PLACEHOLDER`, `TODAY_DATE_PLACEHOLDER`, and `TOPIC_PLACEHOLDER` with the actual values before executing.
 
-Store `TRANSCRIPT` — every turn append in this session targets this file.
+Store `TRANSCRIPT` and `SESSION_N` — every turn append in this session targets this file.
 
 If the write fails, surface the error immediately and stop:
 > Failed to create session transcript at ${TRANSCRIPT}: [error]. Stopping.

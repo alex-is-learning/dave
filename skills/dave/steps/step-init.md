@@ -56,12 +56,12 @@ If this command fails, surface the error immediately and stop:
 
 ## 4. Log File Creation
 
-Only create `dave-log-<topic>.md` if it does not already exist (idempotent — do not overwrite):
+Only create `Dave Log - ${TOPIC}.md` if it does not already exist (idempotent — do not overwrite):
 
 ```bash
-if [ ! -f "dave-log-${TOPIC}.md" ]; then
+if [ ! -f "Dave Log - ${TOPIC}.md" ]; then
   TODAY=$(date '+%Y-%m-%dT%H:%M')
-  cat > "dave-log-${TOPIC}.md" << LOGEOF
+  cat > "Dave Log - ${TOPIC}.md" << LOGEOF
 ---
 date: ${TODAY}
 tags: [Dave]
@@ -83,7 +83,7 @@ fi
 ```
 
 If the write fails, surface the error immediately and stop:
-> Failed to create dave-log-${TOPIC}.md: [error]. Stopping.
+> Failed to create Dave Log - ${TOPIC}.md: [error]. Stopping.
 
 **Log file schema:**
 - **Current A/B/U State** — updated by Dave at each session (Dave adds/promotes items here); read at `/dave hello`
@@ -235,15 +235,15 @@ Do not present uncertain content with false confidence. Flag it and continue. Al
 
 ### 7c. Write the primer file
 
-Only write `dave-primer-${TOPIC}.md` if it does not already exist (idempotent):
+Only write `Dave Primer - ${TOPIC}.md` if it does not already exist (idempotent):
 
 ```bash
-[ ! -f "dave-primer-${TOPIC}.md" ] && echo "CREATE" || echo "EXISTS"
+[ ! -f "Dave Primer - ${TOPIC}.md" ] && echo "CREATE" || echo "EXISTS"
 ```
 
 If it already exists, tell Alex:
 
-> `dave-primer-${TOPIC}.md` already exists. I'll leave it untouched. If you want to regenerate it, delete it and run `/dave init` again.
+> `Dave Primer - ${TOPIC}.md` already exists. I'll leave it untouched. If you want to regenerate it, delete it and run `/dave init` again.
 
 Then skip to section 7d.
 
@@ -251,7 +251,7 @@ If it does not exist, write it:
 
 ```bash
 TODAY=$(date '+%Y-%m-%dT%H:%M')
-cat > "dave-primer-${TOPIC}.md" << 'PRIMEREOF'
+cat > "Dave Primer - ${TOPIC}.md" << 'PRIMEREOF'
 ---
 date: TODAY_PLACEHOLDER
 tags: [Dave]
@@ -266,12 +266,12 @@ PRIMEREOF
 Replace `TODAY_PLACEHOLDER` with the actual date, `TOPIC_PLACEHOLDER` with the actual topic, and `[primer content here]` with the full composed primer from section 7b.
 
 If the write fails, surface the error immediately and stop:
-> Failed to write dave-primer-${TOPIC}.md: [error]. Stopping.
+> Failed to write Dave Primer - ${TOPIC}.md: [error]. Stopping.
 
 ### 7d. Invite review
 
 Tell Alex:
 
-> I've written `dave-primer-${TOPIC}.md`. Please read it and let me know if anything is wrong, missing, or pitched at the wrong level. I've flagged anything I'm uncertain about with a ⚠️ marker — correct those if you can.
+> I've written `Dave Primer - ${TOPIC}.md`. Please read it and let me know if anything is wrong, missing, or pitched at the wrong level. I've flagged anything I'm uncertain about with a ⚠️ marker — correct those if you can.
 >
 > Once you're satisfied, we're done with init. Run `/dave hello` to start your first session.

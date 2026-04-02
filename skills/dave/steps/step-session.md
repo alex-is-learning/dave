@@ -15,17 +15,17 @@ At session open, the following are in your working context (established in `step
 
 - `SLUG` — topic slug from `basename "$PWD"`
 - `TOPIC` — human-readable topic name (e.g. `Schema Therapy`)
-- `TRANSCRIPT` — path to the session transcript file: `sessions/YYYY-MM-DD-<topic>.md`
-- **A/B/U state** — current items parsed from `dave-log-<topic>.md`
-- **Primer content** — full text of `dave-primer-<topic>.md`
+- `TRANSCRIPT` — path to the session transcript file: `sessions/<topic> Dave session N.md`
+- **A/B/U state** — current items parsed from `Dave Log - <topic>.md`
+- **Primer content** — full text of `Dave Primer - <topic>.md`
 
 If for any reason `TRANSCRIPT` is not in context, re-derive it:
 
 ```bash
 SLUG=$(basename "$PWD")
 TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
-TODAY_DATE=$(date '+%Y-%m-%d')
-TRANSCRIPT="sessions/${TODAY_DATE}-${TOPIC}.md"
+SESSION_N=$(($(ls sessions/ 2>/dev/null | grep -c "^${TOPIC} Dave session ") - 1))
+TRANSCRIPT="sessions/${TOPIC} Dave session ${SESSION_N}.md"
 ```
 
 ---
