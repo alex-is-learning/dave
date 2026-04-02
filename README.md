@@ -2,6 +2,8 @@
 
 A Claude Code skill that acts as a personal Socratic tutor, living inside an Obsidian + Quartz vault. Dave helps you learn topics deeply through active recall, A/B/U structured writing, and deliberate grappling. It never gives you the answer — it points at the gap and waits.
 
+**[See Dave in action →](https://alexislearning.me/scrapbook/2026/learning/Alex-and-Dave)**
+
 ---
 
 ## Philosophy
