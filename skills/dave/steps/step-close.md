@@ -29,21 +29,21 @@ Open with:
 
 Ask each question in sequence. Wait for a full response before asking the next.
 
-### 2a. A items — what was verified
+### 2a. A items — new learnings
 
-> What from today can you now consider settled? Any B items you actually tested that you'd move to A — things you genuinely understand now rather than believe?
+> What landed today — new things that seem true and useful that you'd put on the A list? Not things you've confirmed yet, just things that arrived and feel worth tracking.
 
 Wait for Alex's response. "Nothing" is a valid answer.
 
-### 2b. B items — what shifted or deepened
+### 2b. B items — A items that got empirical backing
 
-> What do you believe more firmly now, or believe in a new way? Any new claims you'd put on the believed-but-not-yet-verified list?
+> Did any existing A items receive empirical backing today — things you'd now move to B? What actually tested out?
 
 Wait for Alex's response.
 
-### 2c. U items — gaps named
+### 2c. U items — things that didn't land
 
-> What gaps did we surface? Any new U items — concepts you realised you can't actually define, or mechanisms you don't have yet?
+> What came up that didn't land or resonate? Things you encountered but couldn't integrate yet?
 
 Wait for Alex's response.
 

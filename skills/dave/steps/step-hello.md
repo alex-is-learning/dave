@@ -65,9 +65,9 @@ Then continue with section 3.
 
 From the `dave-log-<topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
 
-- **A** (Accepted) — claims that have been verified or resolved; no longer contested
-- **B** (Believed) — claims Alex holds confidently but that have not yet been verified; prime targets for Socratic interrogation
-- **U** (Unknown) — gaps, undefined concepts, or missing ontology Alex has acknowledged
+- **A** — new learnings that seem true and useful, but not yet empirically backed; prime targets for Socratic interrogation
+- **B** — A items that have since received empirical backing; more settled
+- **U** — things encountered that didn't land or resonate
 
 Hold these three lists in your working context. They drive the action menu in section 6 and the entire session strategy.
 
@@ -254,8 +254,8 @@ Present options derived from the A/B/U state you parsed in section 3.
 
 **Build the menu dynamically:**
 
-- For each B item in the current state → add: "Probe: [item]"
-- For each U item in the current state → add: "Map: [item]"
+- For each A item in the current state → add: "Probe: [item]"
+- For each U item in the current state → add: "Revisit: [item]"
 - Always add: "Open new territory"
 
 **If the A/B/U state is empty** (no items in any category): offer only "Open new territory" and note that this is a first session with a blank state.
@@ -264,9 +264,9 @@ Present options derived from the A/B/U state you parsed in section 3.
 
 > What would you like to work on today?
 >
-> 1. Probe: [B item 1]
-> 2. Probe: [B item 2]
-> 3. Map: [U item 1]
+> 1. Probe: [A item 1]
+> 2. Probe: [A item 2]
+> 3. Revisit: [U item 1]
 > 4. Open new territory
 >
 > Choose a number, or tell me what's on your mind.
