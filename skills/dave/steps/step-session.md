@@ -14,16 +14,18 @@ This file governs all in-session behaviour. It is loaded once at session open (f
 At session open, the following are in your working context (established in `step-hello.md`):
 
 - `SLUG` — topic slug from `basename "$PWD"`
-- `TRANSCRIPT` — path to the session transcript file: `sessions/YYYY-MM-DD-<slug>.md`
-- **A/B/U state** — current items parsed from `dave-log-<slug>.md`
-- **Primer content** — full text of `dave-primer-<slug>.md`
+- `TOPIC` — human-readable topic name (e.g. `Schema Therapy`)
+- `TRANSCRIPT` — path to the session transcript file: `sessions/YYYY-MM-DD-<topic>.md`
+- **A/B/U state** — current items parsed from `dave-log-<topic>.md`
+- **Primer content** — full text of `dave-primer-<topic>.md`
 
 If for any reason `TRANSCRIPT` is not in context, re-derive it:
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 TODAY_DATE=$(date '+%Y-%m-%d')
-TRANSCRIPT="sessions/${TODAY_DATE}-${SLUG}.md"
+TRANSCRIPT="sessions/${TODAY_DATE}-${TOPIC}.md"
 ```
 
 ---

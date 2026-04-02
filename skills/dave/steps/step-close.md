@@ -13,10 +13,11 @@ Read this file completely before acting. Execute sections in order. Do not skip.
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 SESSION_DATE=$(date '+%Y-%m-%d')
 ```
 
-Store both. You'll need them throughout this step.
+Store all three. You'll need them throughout this step.
 
 ---
 
@@ -76,10 +77,10 @@ Compose a session summary: 1–2 sentences describing what was covered and what 
 
 Recall the duration Alex committed at the start of this session (from `/dave hello` section 7).
 
-Append the session block to `dave-log-<slug>.md` using bash heredoc append — never read-then-write:
+Append the session block to `dave-log-<topic>.md` using bash heredoc append — never read-then-write:
 
 ```bash
-cat >> "dave-log-${SLUG}.md" << "CLOSEEOF"
+cat >> "dave-log-${TOPIC}.md" << "CLOSEEOF"
 
 **Session:** SESSION_DATE_PLACEHOLDER
 **Duration:** DURATION_PLACEHOLDER
@@ -107,10 +108,10 @@ Do not proceed to section 5 after a write failure. (NFR7)
 
 ## 5. A/B/U State Update (ARCH2)
 
-If the reflection in section 2 surfaced any new items — new B's, newly confirmed A's, or new U's — append them to the Current A/B/U State table in `dave-log-<slug>.md`:
+If the reflection in section 2 surfaced any new items — new B's, newly confirmed A's, or new U's — append them to the Current A/B/U State table in `dave-log-<topic>.md`:
 
 ```bash
-cat >> "dave-log-${SLUG}.md" << "STATEEOF"
+cat >> "dave-log-${TOPIC}.md" << "STATEEOF"
 | A | ITEM_PLACEHOLDER | From session SESSION_DATE_PLACEHOLDER |
 STATEEOF
 ```
@@ -125,11 +126,11 @@ If there are no new items to add, skip this section.
 
 ## 6. Homepage Update (FR27, ARCH2, NFR6)
 
-Append a new row to `../alex-and-dave.md`:
+Append a new row to `../Alex and Dave.md`:
 
 ```bash
-cat >> "../alex-and-dave.md" << "HOMEEOF"
-| SESSION_DATE_PLACEHOLDER | SLUG_PLACEHOLDER | DURATION_PLACEHOLDER | complete | SCORE_PLACEHOLDER/5 | A: A_SUMMARY. B: B_SUMMARY. U: U_SUMMARY. |
+cat >> "../Alex and Dave.md" << "HOMEEOF"
+| SESSION_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | DURATION_PLACEHOLDER | complete | SCORE_PLACEHOLDER/5 | A: A_SUMMARY. B: B_SUMMARY. U: U_SUMMARY. |
 HOMEEOF
 ```
 
@@ -146,6 +147,7 @@ If the write fails:
 
 ## 7. Close
 
+
 Tell Alex:
 
 > Done. Session logged.
@@ -156,10 +158,10 @@ Tell Alex:
 
 When a session ends without `/dave end` being called, step-hello.md section 6 detects this on the next `/dave hello` and writes the following early exit block.
 
-**Log block (append to `dave-log-<slug>.md`):**
+**Log block (append to `dave-log-<topic>.md`):**
 
 ```bash
-cat >> "dave-log-${SLUG}.md" << "EXITEOF"
+cat >> "dave-log-${TOPIC}.md" << "EXITEOF"
 
 **Session:** MISSED_DATE_PLACEHOLDER
 **Status:** incomplete
@@ -168,11 +170,11 @@ cat >> "dave-log-${SLUG}.md" << "EXITEOF"
 EXITEOF
 ```
 
-**Homepage row (append to `../alex-and-dave.md`):**
+**Homepage row (append to `../Alex and Dave.md`):**
 
 ```bash
-cat >> "../alex-and-dave.md" << "EXITHOMEEOF"
-| MISSED_DATE_PLACEHOLDER | SLUG_PLACEHOLDER | — | incomplete | — | — |
+cat >> "../Alex and Dave.md" << "EXITHOMEEOF"
+| MISSED_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | — | incomplete | — | — |
 EXITHOMEEOF
 ```
 

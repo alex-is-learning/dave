@@ -8,20 +8,21 @@ Read this file completely before acting. Execute sections in order. Do not skip.
 
 ---
 
-## 1. Slug Derivation
+## 1. Slug and Topic Derivation
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 ```
 
-Store `SLUG`. NEVER ask Alex for it. NEVER hardcode it.
+Store `SLUG` and `TOPIC`. NEVER ask Alex for them. NEVER hardcode them.
 
 ---
 
-## 2. Load `dave-log-<slug>.md`
+## 2. Load `dave-log-<topic>.md`
 
 ```bash
-[ -f "dave-log-${SLUG}.md" ] && echo "EXISTS" || echo "MISSING"
+[ -f "dave-log-${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
 ```
 
 **If the log exists:** read it in full. You will use it in sections 3 and 5.
@@ -30,7 +31,7 @@ Store `SLUG`. NEVER ask Alex for it. NEVER hardcode it.
 
 ```bash
 TODAY=$(date '+%Y-%m-%dT%H:%M')
-cat > "dave-log-${SLUG}.md" << LOGEOF
+cat > "dave-log-${TOPIC}.md" << LOGEOF
 ---
 date: ${TODAY}
 tags: [Dave]
@@ -54,7 +55,7 @@ If the write fails, surface the error immediately and stop.
 
 Tell Alex:
 
-> No session log found for **${SLUG}** — I've created a fresh one. This looks like your first session on this topic.
+> No session log found for **${TOPIC}** — I've created a fresh one. This looks like your first session on this topic.
 
 Then continue with section 3.
 
@@ -62,7 +63,7 @@ Then continue with section 3.
 
 ## 3. Parse the Current A/B/U State
 
-From the `dave-log-<slug>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
+From the `dave-log-<topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
 
 - **A** (Accepted) — claims that have been verified or resolved; no longer contested
 - **B** (Believed) — claims Alex holds confidently but that have not yet been verified; prime targets for Socratic interrogation
@@ -74,17 +75,17 @@ If the table is empty (first session or no entries yet): note that the A/B/U sta
 
 ---
 
-## 4. Load `dave-primer-<slug>.md`
+## 4. Load `dave-primer-<topic>.md`
 
 ```bash
-[ -f "dave-primer-${SLUG}.md" ] && echo "EXISTS" || echo "MISSING"
+[ -f "dave-primer-${TOPIC}.md" ] && echo "EXISTS" || echo "MISSING"
 ```
 
 **If the primer exists:** read it in full. This is your primary knowledge source for the session. Do not surface its contents to Alex — use it to inform your questions, calibrate depth, and assess Alex's claims.
 
 **If the primer is missing:** warn Alex and stop:
 
-> `dave-primer-${SLUG}.md` is missing. This usually means `/dave init` hasn't been run for this topic yet, or the primer was moved or deleted.
+> `dave-primer-${TOPIC}.md` is missing. This usually means `/dave init` hasn't been run for this topic yet, or the primer was moved or deleted.
 >
 > Please run `/dave init` first to generate the primer, then return here.
 
@@ -134,7 +135,7 @@ This section detects sessions that ended without `/dave end` and records them be
 ### 6a. Find the most recent transcript
 
 ```bash
-ls sessions/ 2>/dev/null | grep "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-${SLUG}\.md$" | sort | tail -1
+ls sessions/ 2>/dev/null | grep "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-${TOPIC}\.md$" | sort | tail -1
 ```
 
 If `sessions/` is empty or does not exist: no previous session → skip to section 7.
@@ -151,22 +152,23 @@ All good. Continue to section 7 without comment.
 **Case B — Matching block found with `**Status:** incomplete`:**
 The early exit was already recorded. Tell Alex:
 
-> Your last session on **${SLUG}** ended without a close ritual — no reflection was captured. Just so you know.
+> Your last session on **${TOPIC}** ended without a close ritual — no reflection was captured. Just so you know.
 
 Then continue to section 7.
 
 **Case C — No matching block found for `${LAST_TRANSCRIPT_DATE}`:**
 A session was never closed. Write the early exit block and homepage row now (Story 4.3), then surface the note.
 
-Derive slug and missed date:
+Derive topic and missed date:
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 MISSED_DATE=LAST_TRANSCRIPT_DATE_VALUE
 ```
 
-Append early exit block to `dave-log-${SLUG}.md`:
+Append early exit block to `dave-log-${TOPIC}.md`:
 ```bash
-cat >> "dave-log-${SLUG}.md" << "EXITEOF"
+cat >> "dave-log-${TOPIC}.md" << "EXITEOF"
 
 **Session:** MISSED_DATE_PLACEHOLDER
 **Status:** incomplete
@@ -175,10 +177,10 @@ cat >> "dave-log-${SLUG}.md" << "EXITEOF"
 EXITEOF
 ```
 
-Append incomplete row to `../alex-and-dave.md`:
+Append incomplete row to `../Alex and Dave.md`:
 ```bash
-cat >> "../alex-and-dave.md" << "EXITHOMEEOF"
-| MISSED_DATE_PLACEHOLDER | SLUG_PLACEHOLDER | — | incomplete | — | — |
+cat >> "../Alex and Dave.md" << "EXITHOMEEOF"
+| MISSED_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | — | incomplete | — | — |
 EXITHOMEEOF
 ```
 
@@ -189,7 +191,7 @@ If either write fails, surface the error but do not stop the session:
 
 Tell Alex:
 
-> Your last session on **${SLUG}** ended without a close ritual — no reflection was captured. I've logged it as incomplete. Just so you know.
+> Your last session on **${TOPIC}** ended without a close ritual — no reflection was captured. I've logged it as incomplete. Just so you know.
 
 Then continue to section 7.
 
@@ -217,9 +219,10 @@ Create the session transcript file using bash heredoc append (never read-then-wr
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 TODAY_DATE=$(date '+%Y-%m-%d')
 TODAY_FULL=$(date '+%Y-%m-%dT%H:%M')
-TRANSCRIPT="sessions/${TODAY_DATE}-${SLUG}.md"
+TRANSCRIPT="sessions/${TODAY_DATE}-${TOPIC}.md"
 
 cat >> "${TRANSCRIPT}" << 'SESSEOF'
 ---
@@ -229,14 +232,14 @@ tags: [Dave]
 
 # Session: TODAY_DATE_PLACEHOLDER
 
-**Topic:** SLUG_PLACEHOLDER
+**Topic:** TOPIC_PLACEHOLDER
 
 ---
 
 SESSEOF
 ```
 
-Replace `TODAY_FULL_PLACEHOLDER`, `TODAY_DATE_PLACEHOLDER`, and `SLUG_PLACEHOLDER` with the actual values before executing.
+Replace `TODAY_FULL_PLACEHOLDER`, `TODAY_DATE_PLACEHOLDER`, and `TOPIC_PLACEHOLDER` with the actual values before executing.
 
 Store `TRANSCRIPT` — every turn append in this session targets this file.
 

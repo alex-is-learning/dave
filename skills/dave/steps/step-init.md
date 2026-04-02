@@ -9,13 +9,16 @@ Read this file completely before acting. Execute sections in order. Do not skip.
 
 ---
 
-## 1. Slug Derivation
+## 1. Slug and Topic Derivation
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 ```
 
-Store `SLUG` — you will use it throughout this step. NEVER ask Alex for it. NEVER hardcode it.
+Store `SLUG` and `TOPIC` — you will use them throughout this step. NEVER ask Alex for them. NEVER hardcode them.
+
+- Example: CWD = `/learning/schema-therapy/` → slug = `schema-therapy`, topic = `Schema Therapy`
 
 ---
 
@@ -25,12 +28,12 @@ Run these checks before touching any files:
 
 ```bash
 # Wrong depth check
-[ -f "../../alex-and-dave.md" ] && echo "WRONG_DEPTH"
+[ -f "../../Alex and Dave.md" ] && echo "WRONG_DEPTH"
 # Correct depth check
-[ -f "../alex-and-dave.md" ] && echo "EXISTS" || echo "ABSENT"
+[ -f "../Alex and Dave.md" ] && echo "EXISTS" || echo "ABSENT"
 ```
 
-**If `../../alex-and-dave.md` exists → warn and stop immediately:**
+**If `../../Alex and Dave.md` exists → warn and stop immediately:**
 
 > Your CWD appears to be one level too deep. `/dave init` must be run from directly inside your topic folder (e.g. `/learning/graph-theory/`), not a subfolder within it. Please `cd` to the correct directory and try again.
 
@@ -53,12 +56,12 @@ If this command fails, surface the error immediately and stop:
 
 ## 4. Log File Creation
 
-Only create `dave-log-<slug>.md` if it does not already exist (idempotent — do not overwrite):
+Only create `dave-log-<topic>.md` if it does not already exist (idempotent — do not overwrite):
 
 ```bash
-if [ ! -f "dave-log-${SLUG}.md" ]; then
+if [ ! -f "dave-log-${TOPIC}.md" ]; then
   TODAY=$(date '+%Y-%m-%dT%H:%M')
-  cat > "dave-log-${SLUG}.md" << LOGEOF
+  cat > "dave-log-${TOPIC}.md" << LOGEOF
 ---
 date: ${TODAY}
 tags: [Dave]
@@ -80,7 +83,7 @@ fi
 ```
 
 If the write fails, surface the error immediately and stop:
-> Failed to create dave-log-${SLUG}.md: [error]. Stopping.
+> Failed to create dave-log-${TOPIC}.md: [error]. Stopping.
 
 **Log file schema:**
 - **Current A/B/U State** — updated by Dave at each session (Dave adds/promotes items here); read at `/dave hello`
@@ -91,9 +94,9 @@ If the write fails, surface the error immediately and stop:
 ## 5. Homepage Check / Creation
 
 ```bash
-if [ ! -f "../alex-and-dave.md" ]; then
+if [ ! -f "../Alex and Dave.md" ]; then
   TODAY=$(date '+%Y-%m-%dT%H:%M')
-  cat > "../alex-and-dave.md" << HOMEEOF
+  cat > "../Alex and Dave.md" << HOMEEOF
 ---
 date: ${TODAY}
 tags: [Dave]
@@ -110,9 +113,9 @@ HOMEEOF
 fi
 ```
 
-- If `../alex-and-dave.md` already exists: proceed without modifying it.
+- If `../Alex and Dave.md` already exists: proceed without modifying it.
 - If the write fails, surface the error immediately and stop:
-  > Failed to create ../alex-and-dave.md: [error]. Stopping.
+  > Failed to create ../Alex and Dave.md: [error]. Stopping.
 
 ---
 
@@ -232,15 +235,15 @@ Do not present uncertain content with false confidence. Flag it and continue. Al
 
 ### 7c. Write the primer file
 
-Only write `dave-primer-${SLUG}.md` if it does not already exist (idempotent):
+Only write `dave-primer-${TOPIC}.md` if it does not already exist (idempotent):
 
 ```bash
-[ ! -f "dave-primer-${SLUG}.md" ] && echo "CREATE" || echo "EXISTS"
+[ ! -f "dave-primer-${TOPIC}.md" ] && echo "CREATE" || echo "EXISTS"
 ```
 
 If it already exists, tell Alex:
 
-> `dave-primer-${SLUG}.md` already exists. I'll leave it untouched. If you want to regenerate it, delete it and run `/dave init` again.
+> `dave-primer-${TOPIC}.md` already exists. I'll leave it untouched. If you want to regenerate it, delete it and run `/dave init` again.
 
 Then skip to section 7d.
 
@@ -248,27 +251,27 @@ If it does not exist, write it:
 
 ```bash
 TODAY=$(date '+%Y-%m-%dT%H:%M')
-cat > "dave-primer-${SLUG}.md" << 'PRIMEREOF'
+cat > "dave-primer-${TOPIC}.md" << 'PRIMEREOF'
 ---
 date: TODAY_PLACEHOLDER
 tags: [Dave]
 ---
 
-# Dave Primer: SLUG_PLACEHOLDER
+# Dave Primer: TOPIC_PLACEHOLDER
 
 [primer content here]
 PRIMEREOF
 ```
 
-Replace `TODAY_PLACEHOLDER` with the actual date, `SLUG_PLACEHOLDER` with the actual slug, and `[primer content here]` with the full composed primer from section 7b.
+Replace `TODAY_PLACEHOLDER` with the actual date, `TOPIC_PLACEHOLDER` with the actual topic, and `[primer content here]` with the full composed primer from section 7b.
 
 If the write fails, surface the error immediately and stop:
-> Failed to write dave-primer-${SLUG}.md: [error]. Stopping.
+> Failed to write dave-primer-${TOPIC}.md: [error]. Stopping.
 
 ### 7d. Invite review
 
 Tell Alex:
 
-> I've written `dave-primer-${SLUG}.md`. Please read it and let me know if anything is wrong, missing, or pitched at the wrong level. I've flagged anything I'm uncertain about with a ⚠️ marker — correct those if you can.
+> I've written `dave-primer-${TOPIC}.md`. Please read it and let me know if anything is wrong, missing, or pitched at the wrong level. I've flagged anything I'm uncertain about with a ⚠️ marker — correct those if you can.
 >
 > Once you're satisfied, we're done with init. Run `/dave hello` to start your first session.

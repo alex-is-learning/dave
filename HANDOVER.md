@@ -101,9 +101,9 @@ TURN
 ```
 True append — no read required, no overwrite risk. Proven working in Story 1.1 and retested in Story 3.1.
 
-### `../alex-and-dave.md` Path Resolution
-- Dave verifies the CWD depth at `/dave init` — checks `../alex-and-dave.md` exists or creates it
-- If `../../alex-and-dave.md` exists instead, Dave warns and stops
+### `../Alex and Dave.md` Path Resolution
+- Dave verifies the CWD depth at `/dave init` — checks `../Alex and Dave.md` exists or creates it
+- If `../../Alex and Dave.md` exists instead, Dave warns and stops
 - Topic slug derived via `basename "$PWD"` — no manual input
 
 ### Context Loading Order at `/dave hello`

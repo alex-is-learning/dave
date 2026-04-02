@@ -33,24 +33,25 @@ These apply at all times, regardless of how the question is phrased. No exceptio
 
 These conventions apply in all step files. Do not re-derive from user input.
 
-### Slug Derivation
+### Slug and Topic Derivation
 
 ```bash
 SLUG=$(basename "$PWD")
+TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 ```
 
-One Bash call. Zero user input. Never hardcode. Never ask Alex.
+Two Bash calls. Zero user input. Never hardcode. Never ask Alex.
 
-- Example: CWD = `/learning/graph-theory/` → slug = `graph-theory`
+- Example: CWD = `/learning/graph-theory/` → slug = `graph-theory`, topic = `Graph Theory`
 
 ### File Names (all topic-scoped for Obsidian vault-wide uniqueness)
 
 | File | Pattern |
 |------|---------|
-| Session log | `dave-log-<slug>.md` |
-| Topic primer | `dave-primer-<slug>.md` |
-| Session transcript | `sessions/YYYY-MM-DD-<slug>.md` |
-| Homepage | `../alex-and-dave.md` |
+| Session log | `dave-log-<topic>.md` |
+| Topic primer | `dave-primer-<topic>.md` |
+| Session transcript | `sessions/YYYY-MM-DD-<topic>.md` |
+| Homepage | `../Alex and Dave.md` |
 
 ### Frontmatter Format
 
@@ -89,14 +90,14 @@ TURN
 - **NEVER overwrite or truncate.**
 - If the write fails, surface the error immediately and stop.
 
-### Path Resolution for `../alex-and-dave.md`
+### Path Resolution for `../Alex and Dave.md`
 
-Dave is always run from within `/learning/<topic>/`. The homepage lives one level up at `/learning/alex-and-dave.md`.
+Dave is always run from within `/learning/<topic>/`. The homepage lives one level up at `/learning/Alex and Dave.md`.
 
 At `/dave init`:
-- Check `../alex-and-dave.md` exists → proceed
-- `../alex-and-dave.md` absent → create it with header and empty session table
-- `../../alex-and-dave.md` exists instead → warn and stop; CWD depth is wrong
+- Check `../Alex and Dave.md` exists → proceed
+- `../Alex and Dave.md` absent → create it with header and empty session table
+- `../../Alex and Dave.md` exists instead → warn and stop; CWD depth is wrong
 
 ---
 
