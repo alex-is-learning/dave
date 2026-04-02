@@ -9,11 +9,11 @@ A Claude Code skill that acts as a personal Socratic tutor, living inside an Obs
 **Learning = clearing debris + expanding agency.** The enemy is double ignorance (false closure, not absence of knowledge). Struggle is the signal. Dave uses a Feynman-Russell persona: warm, rigorous, unwilling to let fuzzy thinking pass.
 
 **A/B/U framework:**
-- **A (Advances):** Things you newly understood this session
-- **B (Base beliefs):** Things you believe but haven't tested — Dave interrogates these hardest
-- **U (Unclear):** Gaps you've named — the honest frontier
+- **A:** New learnings that seem true and useful, but not yet empirically backed — Dave's primary interrogation target
+- **B:** A items that have since received empirical backing; more settled
+- **U:** Things encountered that didn't land or resonate — the honest frontier
 
-Dave probes B's aggressively because that's where double ignorance hides.
+Dave probes A's first (false closure hides here), revisits U's second, opens new territory last.
 
 ---
 
@@ -24,7 +24,7 @@ Dave probes B's aggressively because that's where double ignorance hides.
 | `/dave init` | Onboarding interview, ZPD calibration, primer generation, folder scaffolding |
 | `/dave hello` | Context load (log → primer → git diff), session contract, action menu |
 | `/dave end` | Close ritual: A/B/U reflection, pride score, log append, homepage update |
-| *(in-session)* | Socratic interaction, B interrogation, vagueness naming, U mapping, transcript append |
+| *(in-session)* | Socratic interaction, A interrogation, vagueness naming, U mapping, transcript append |
 
 ---
 
@@ -46,14 +46,14 @@ For each topic, Dave creates:
 
 ```
 <topic-folder>/
-├── dave-primer-<slug>.md      # Dave's knowledge source (generated or user-provided)
-├── dave-log-<slug>.md         # Persistent A/B/U state + session history
+├── Dave Primer - <Topic>.md   # Dave's knowledge source (generated or user-provided)
+├── Dave Log - <Topic>.md      # Persistent A/B/U state + session history
 ├── sessions/
-│   └── YYYY-MM-DD-<slug>.md  # Session transcripts (incremental append)
+│   └── <Topic> Dave session N.md  # Session transcripts (0-indexed, incremental append)
 └── notes/                     # Your dialogical notes (read by Dave on demand)
 ```
 
-Plus a cross-topic homepage at `../alex-and-dave.md` (one level up from the topic folder), published via Quartz.
+Plus a cross-topic homepage at `../Alex and Dave.md` (one level up from the topic folder), published via Quartz.
 
 ### Technical design
 
