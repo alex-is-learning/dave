@@ -194,8 +194,35 @@ If the write fails:
 
 ---
 
-## 7. Close
+## 7. Frontmatter and Backlink Check
 
+Scan all `.md` files in the topic folder (including `sessions/` and `notes/` subfolders). For each file, ensure it has `tags: [Dave]` in its frontmatter and an `[[Alex and Dave]]` backlink after the frontmatter. This catches notes Alex wrote manually and any files created before these conventions existed.
+
+```bash
+for f in *.md sessions/*.md notes/*.md; do
+  [ -f "$f" ] || continue
+
+  # 1. Add tags: [Dave] if missing
+  if ! grep -q "tags:.*Dave" "$f"; then
+    if head -1 "$f" | grep -q "^---"; then
+      awk 'NR==1{print; print "tags: [Dave]"; next} {print}' "$f" > /tmp/dave_tag.tmp && mv /tmp/dave_tag.tmp "$f"
+    else
+      { printf -- "---\ntags: [Dave]\n---\n\n"; cat "$f"; } > /tmp/dave_tag.tmp && mv /tmp/dave_tag.tmp "$f"
+    fi
+  fi
+
+  # 2. Add [[Alex and Dave]] backlink if missing
+  if ! grep -q "\[\[Alex and Dave\]\]" "$f"; then
+    awk 'BEGIN{count=0} /^---$/{count++; print; if(count==2){print ""; print "[[Alex and Dave]]"}; next} {print}' "$f" > /tmp/dave_tag.tmp && mv /tmp/dave_tag.tmp "$f"
+  fi
+done
+```
+
+If any individual file write fails, note it briefly and continue — do not stop the close ritual for this.
+
+---
+
+## 8. Close
 
 Tell Alex:
 

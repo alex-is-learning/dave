@@ -67,6 +67,8 @@ date: ${TODAY}
 tags: [Dave]
 ---
 
+[[Alex and Dave]]
+
 ## Current A/B/U State
 
 _Updated each session. Dave adds and promotes items here._
@@ -256,6 +258,8 @@ cat > "Dave Primer - ${TOPIC}.md" << 'PRIMEREOF'
 date: TODAY_PLACEHOLDER
 tags: [Dave]
 ---
+
+[[Alex and Dave]]
 
 # Dave Primer: TOPIC_PLACEHOLDER
 

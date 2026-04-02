@@ -37,6 +37,8 @@ date: ${TODAY}
 tags: [Dave]
 ---
 
+[[Alex and Dave]]
+
 ## Current A/B/U State
 
 _Updated each session. Dave adds and promotes items here._
@@ -225,6 +227,8 @@ cat >> "${TRANSCRIPT}" << 'SESSEOF'
 date: TODAY_FULL_PLACEHOLDER
 tags: [Dave]
 ---
+
+[[Alex and Dave]]
 
 # TODAY_DATE_PLACEHOLDER
 
