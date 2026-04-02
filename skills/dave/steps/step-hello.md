@@ -41,8 +41,8 @@ tags: [Dave]
 
 _Updated each session. Dave adds and promotes items here._
 
-| Category | Item | Notes |
-|----------|------|-------|
+| Type | Content |
+|------|---------|
 
 ## Session History
 
@@ -63,7 +63,7 @@ Then continue with section 3.
 
 ## 3. Parse the Current A/B/U State
 
-From the `Dave Log - <topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Category` column:
+From the `Dave Log - <topic>.md` you just read, locate the **"## Current A/B/U State"** section. Read the table there. Extract rows grouped by the `Type` column:
 
 - **A** — new learnings that seem true and useful, but not yet empirically backed; prime targets for Socratic interrogation
 - **B** — A items that have since received empirical backing; more settled
@@ -159,6 +159,7 @@ A session was never closed. Find the unclosed transcript and extract its date fr
 ```bash
 LAST_FILE=$(ls sessions/ 2>/dev/null | grep "^${TOPIC} Dave session " | sort | tail -1)
 MISSED_DATE=$(head -5 "sessions/${LAST_FILE}" | grep "^date:" | sed 's/date: //' | cut -c1-10)
+MISSED_SESSION_N=$(echo "${LAST_FILE}" | sed 's/.*Dave session //' | sed 's/\.md//')
 ```
 
 Append early exit block to `Dave Log - ${TOPIC}.md`:
@@ -172,11 +173,10 @@ cat >> "Dave Log - ${TOPIC}.md" << "EXITEOF"
 EXITEOF
 ```
 
-Append incomplete row to `../Alex and Dave.md`:
+Insert incomplete row at top of `../Alex and Dave.md`:
 ```bash
-cat >> "../Alex and Dave.md" << "EXITHOMEEOF"
-| MISSED_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | — | incomplete | — | — |
-EXITHOMEEOF
+NEW_ROW="| MISSED_DATE_PLACEHOLDER | [[TOPIC_PLACEHOLDER Dave session MISSED_SESSION_N_PLACEHOLDER]] | — | incomplete | — | — | — | — |"
+awk -v row="$NEW_ROW" '/^\|---/{print; print row; next} {print}' "../Alex and Dave.md" > /tmp/dave_home.tmp && mv /tmp/dave_home.tmp "../Alex and Dave.md"
 ```
 
 Replace placeholders with actual values before executing.

@@ -71,8 +71,8 @@ tags: [Dave]
 
 _Updated each session. Dave adds and promotes items here._
 
-| Category | Item | Notes |
-|----------|------|-------|
+| Type | Content |
+|------|---------|
 
 ## Session History
 
@@ -106,8 +106,8 @@ tags: [Dave]
 
 A log of every learning session.
 
-| Date | Topic | Duration | Status | Pride | A/B/U Notes |
-|------|-------|----------|--------|-------|-------------|
+| Date | Page | Duration | Status | Pride | A | B | U |
+|------|------|----------|--------|-------|---|---|---|
 
 HOMEEOF
 fi

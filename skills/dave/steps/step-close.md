@@ -15,9 +15,48 @@ Read this file completely before acting. Execute sections in order. Do not skip.
 SLUG=$(basename "$PWD")
 TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2)); print}')
 SESSION_DATE=$(date '+%Y-%m-%d')
+SESSION_N=$(($(ls sessions/ 2>/dev/null | grep -c "^${TOPIC} Dave session ") - 1))
+TRANSCRIPT="sessions/${TOPIC} Dave session ${SESSION_N}.md"
 ```
 
-Store all three. You'll need them throughout this step.
+Store all five. You'll need them throughout this step.
+
+---
+
+## 1a. Transcript Integrity Check
+
+Before beginning the close ritual, verify the transcript has session content:
+
+```bash
+TURN_COUNT=$(grep -c "^\*\*Alex:\*\*\|^\*\*Dave:\*\*" "${TRANSCRIPT}" 2>/dev/null || echo 0)
+```
+
+**If `TURN_COUNT` is 0:** The per-turn append was not executed during this session. The transcript exists but contains only the frontmatter header — no actual turns were written. Reconstruct the full transcript now from your conversation context.
+
+Write every **Alex:** and **Dave:** turn from this session (from after the action menu in `/dave hello`, up to but not including this close ritual) to the transcript using heredoc append:
+
+```bash
+cat >> "${TRANSCRIPT}" << 'RECONEOF'
+
+**Alex:** [first message]
+
+**Dave:** [first response]
+
+[all subsequent turns in order]
+RECONEOF
+```
+
+One heredoc is fine — write all turns in a single block. Use the exact messages from the conversation. Do not include the close ritual itself.
+
+Tell Alex:
+> Transcript was empty — I've reconstructed it from context. Continuing with close ritual.
+
+If the write fails:
+> Transcript reconstruction failed: [error]. Please check your filesystem.
+
+Do not proceed after a write failure.
+
+**If `TURN_COUNT` > 0:** Proceed normally — turns were already written during the session.
 
 ---
 
@@ -112,11 +151,11 @@ If the reflection in section 2 surfaced any new items — new B's, newly confirm
 
 ```bash
 cat >> "Dave Log - ${TOPIC}.md" << "STATEEOF"
-| A | ITEM_PLACEHOLDER | From session SESSION_DATE_PLACEHOLDER |
+| A | ITEM_PLACEHOLDER |
 STATEEOF
 ```
 
-Run one heredoc per new item. Repeat for each B or U item similarly.
+Run one heredoc per new item. Use `| A |`, `| B |`, or `| U |` as appropriate. Repeat for each item.
 
 **Note on promotions (B→A):** Append-only means you cannot remove a B row when it becomes A. Add the new A row. Alex can manually remove the old B row between sessions if he wants a clean table. The log block in section 4 contains the full reflection — the table is a working reference, not the canonical record.
 
@@ -126,17 +165,16 @@ If there are no new items to add, skip this section.
 
 ## 6. Homepage Update (FR27, ARCH2, NFR6)
 
-Append a new row to `../Alex and Dave.md`:
+Insert a new row at the top of the session table in `../Alex and Dave.md` (newest sessions first):
 
 ```bash
-cat >> "../Alex and Dave.md" << "HOMEEOF"
-| SESSION_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | DURATION_PLACEHOLDER | complete | SCORE_PLACEHOLDER/5 | A: A_SUMMARY. B: B_SUMMARY. U: U_SUMMARY. |
-HOMEEOF
+NEW_ROW="| SESSION_DATE_PLACEHOLDER | [[TOPIC_PLACEHOLDER Dave session SESSION_N_PLACEHOLDER]] | DURATION_PLACEHOLDER | complete | SCORE_PLACEHOLDER/5 | A_SUMMARY_PLACEHOLDER | B_SUMMARY_PLACEHOLDER | U_SUMMARY_PLACEHOLDER |"
+awk -v row="$NEW_ROW" '/^\|---/{print; print row; next} {print}' "../Alex and Dave.md" > /tmp/dave_home.tmp && mv /tmp/dave_home.tmp "../Alex and Dave.md"
 ```
 
 Keep each A/B/U summary to one short phrase. The full reflection is in the log; this is the index row.
 
-Replace every placeholder with actual values before executing.
+Replace every placeholder with actual values before executing. `SESSION_N` and `TRANSCRIPT` were derived in section 1.
 
 If the write fails:
 > Homepage update failed: [error]. The log block was written successfully — only the homepage row is missing. Please check your filesystem.
@@ -170,12 +208,11 @@ cat >> "Dave Log - ${TOPIC}.md" << "EXITEOF"
 EXITEOF
 ```
 
-**Homepage row (append to `../Alex and Dave.md`):**
+**Homepage row (insert at top of `../Alex and Dave.md`):**
 
 ```bash
-cat >> "../Alex and Dave.md" << "EXITHOMEEOF"
-| MISSED_DATE_PLACEHOLDER | TOPIC_PLACEHOLDER | — | incomplete | — | — |
-EXITHOMEEOF
+NEW_ROW="| MISSED_DATE_PLACEHOLDER | [[TOPIC_PLACEHOLDER Dave session SESSION_N_PLACEHOLDER]] | — | incomplete | — | — | — | — |"
+awk -v row="$NEW_ROW" '/^\|---/{print; print row; next} {print}' "../Alex and Dave.md" > /tmp/dave_home.tmp && mv /tmp/dave_home.tmp "../Alex and Dave.md"
 ```
 
 The partial transcript from the missed session remains intact. No reflection or pride score is captured for an early exit. (NFR4, FR28)
