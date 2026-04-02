@@ -17,9 +17,20 @@ TOPIC=$(echo "$SLUG" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(subst
 SESSION_DATE=$(date '+%Y-%m-%d')
 SESSION_N=$(($(ls sessions/ 2>/dev/null | grep -c "^${TOPIC} Dave session ") - 1))
 TRANSCRIPT="sessions/${TOPIC} Dave session ${SESSION_N}.md"
+SESSION_START_STR=$(grep "^date:" "${TRANSCRIPT}" | sed 's/date: //')
+SESSION_START=$(date -j -f '%Y-%m-%dT%H:%M' "${SESSION_START_STR}" '+%s' 2>/dev/null)
+SESSION_END=$(date '+%s')
+ELAPSED_MINS=$(( (SESSION_END - SESSION_START) / 60 ))
+if [ -z "$SESSION_START" ] || [ "$ELAPSED_MINS" -le 0 ]; then
+  ACTUAL_DURATION="unknown"
+elif [ "$ELAPSED_MINS" -lt 60 ]; then
+  ACTUAL_DURATION="${ELAPSED_MINS} min"
+else
+  ACTUAL_DURATION="$((ELAPSED_MINS / 60))h $((ELAPSED_MINS % 60))min"
+fi
 ```
 
-Store all five. You'll need them throughout this step.
+Store all variables. You'll need them throughout this step.
 
 ---
 
@@ -114,7 +125,7 @@ Do not proceed to section 4 until a valid integer is received.
 
 Compose a session summary: 1–2 sentences describing what was covered and what most changed. Factual, no editorializing.
 
-Recall the duration Alex committed at the start of this session (from `/dave hello` section 7).
+`ACTUAL_DURATION` was computed in section 1 from the transcript's start timestamp vs. now.
 
 Append the session block to `Dave Log - <topic>.md` using bash heredoc append — never read-then-write:
 
@@ -122,7 +133,7 @@ Append the session block to `Dave Log - <topic>.md` using bash heredoc append �
 cat >> "Dave Log - ${TOPIC}.md" << "CLOSEEOF"
 
 **Session:** SESSION_DATE_PLACEHOLDER
-**Duration:** DURATION_PLACEHOLDER
+**Duration:** ACTUAL_DURATION_PLACEHOLDER
 **Status:** complete
 **Pride:** SCORE_PLACEHOLDER/5
 
