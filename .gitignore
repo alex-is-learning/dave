@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# PDFs (live in the Obsidian vault, not here)
+*.pdf
+
+# Editor
+.vscode/
+.idea/
+
+# Node / npm (in case any tooling gets added)
+node_modules/
