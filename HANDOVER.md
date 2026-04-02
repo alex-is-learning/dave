@@ -1,7 +1,7 @@
 # Project Handover
 
 **Project:** Dave — AI Learning Tutor
-**Date:** 2026-04-01
+**Date:** 2026-04-02
 **Status:** All 12 MVP stories complete — active testing in scrapbook Obsidian vault
 
 ---
@@ -167,7 +167,7 @@ ARCH2 forbids read-then-write. The Current A/B/U State table is updated by appen
 ### Implementation Patterns (key rules for any Claude implementing Dave)
 1. Derive topic slug from `basename "$PWD"` — never hardcode or ask Alex
 2. Use bash heredoc append for all writes to transcript, log, and homepage
-3. Frontmatter format: `date: DD/MM/YYYY, HH:MM` + `tags: [Dave]` — no extra fields
+3. Frontmatter format: `date: YYYY-MM-DDTHH:MM` + `tags: [Dave]` — no extra fields
 4. Transcript turns: `**Alex:**` / `**Dave:**` — one blank line between turns
 5. End every log block with `---`
 6. Surface file write errors immediately — never continue silently
@@ -178,9 +178,54 @@ ARCH2 forbids read-then-write. The Current A/B/U State table is updated by appen
 
 ---
 
+## Repo Structure
+
+```
+~/claude/dave/
+├── README.md
+├── HANDOVER.md
+├── skills/
+│   └── dave/                    ← skill implementation (source of truth)
+│       ├── SKILL.md
+│       ├── workflow.md
+│       └── steps/
+│           ├── step-init.md
+│           ├── step-hello.md
+│           ├── step-session.md
+│           └── step-close.md
+└── _bmad-output/                ← planning artefacts
+    ├── prd.md
+    ├── architecture.md
+    ├── epics.md
+    └── ...
+```
+
+`~/.claude/skills/dave` is a symlink to `~/claude/dave/skills/dave`. Editing files in the repo is immediately live — no deployment step.
+
+---
+
+## Bugs Fixed (2026-04-02)
+
+### Obsidian YAML date parsing
+- **Bug:** Date frontmatter written as `DD/MM/YYYY, HH:MM` (e.g. `01/04/2026, 18:33`) was being parsed by Obsidian as a garbled date (`20/04/2001`)
+- **Fix:** Changed all date format strings to ISO 8601: `date '+%Y-%m-%dT%H:%M'`
+- **Files changed:** `workflow.md`, `step-init.md` (3 occurrences), `step-hello.md` (2 occurrences)
+- **Note:** Any files Dave already created have the old format — fix manually if needed
+
+---
+
 ## Current Status
 
-All 12 stories are implemented. Dave is now being tested inside the scrapbook Obsidian vault.
+All 12 stories implemented. Active testing in scrapbook Obsidian vault. One bug fixed (date format). No known blockers.
+
+---
+
+## Next Steps
+
+1. **Continue smoke testing** `/dave init` → `/dave hello` → in-session → `/dave end` on a real topic in the scrapbook vault
+2. **Verify date fix** — confirm new sessions show the correct date in Obsidian properties
+3. **Test early exit detection** — start a session, don't run `/dave end`, verify Case C triggers correctly on next `/dave hello`
+4. **If testing surfaces more bugs** — fix in `skills/dave/` (changes are immediately live via symlink), then commit and push
 
 ---
 
