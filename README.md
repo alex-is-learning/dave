@@ -17,6 +17,20 @@ A Claude Code skill that acts as a personal Socratic tutor, living inside an Obs
 
 Dave probes A's first (false closure hides here), revisits U's second, opens new territory last.
 
+```mermaid
+stateDiagram-v2
+    direction LR
+    A : A — seems true, not yet backed
+    B : B — confirmed
+    U : U — didn't land
+
+    [*] --> A : new learning arrives
+    A --> B : empirically backed
+    A --> U : probed — can't explain
+    U --> A : revisited — integrates
+    B --> [*] : settled
+```
+
 ---
 
 ## Commands
@@ -41,6 +55,58 @@ Dave is installed as a Claude Code skill at `~/.claude/skills/dave/`. Each topic
 3. Run `/dave hello` to start a session — Dave loads context, surfaces a continuity note if you bailed last time, and presents a session contract
 4. **Grapple.** Dave interrogates your beliefs, names your vagueness, maps your gaps. You can ask Dave to read your notes. It will never give you the subject-matter answer.
 5. Run `/dave end` — structured A/B/U reflection, pride score (1–5), log and homepage updated
+
+```mermaid
+flowchart TD
+    Start([Start new topic]) --> Init[/dave init]
+    Init --> I1[Onboarding interview\n& ZPD calibration]
+    I1 --> I2[Primer generated]
+    I2 --> Hello
+
+    Hello[/dave hello] --> H1[Load log · primer · git diff]
+    H1 --> H2{Unclosed\nsession?}
+    H2 -- Yes --> H3[Log as incomplete\non homepage]
+    H3 --> H4
+    H2 -- No --> H4[Session contract\n& action menu]
+    H4 --> Grapple
+
+    Grapple[Grapple] --> S1{/dave end?}
+    S1 -- Bail --> S2[Detected next\n/dave hello]
+    S2 --> Hello
+
+    S1 -- Yes --> End[/dave end]
+    End --> E1[A/B/U reflection\n& pride score]
+    E1 --> E2[Log + homepage updated]
+    E2 --> E3{Another\nsession?}
+    E3 -- Yes --> Hello
+    E3 -- No --> Done([Done])
+```
+
+### In-session interaction
+
+Every Dave turn follows the same interrogation logic:
+
+```mermaid
+flowchart TD
+    Open([Session opens]) --> Menu[Action menu:\nProbe A · Revisit U · New territory]
+    Menu --> Turn[Alex sends a message]
+
+    Turn --> Dave{Dave reads\nthe message}
+    Dave -- Vague language --> NameVague[Name the hedge,\ndemand precision]
+    Dave -- Asks Dave for answer --> Withhold[Withhold — ask what\nAlex thinks instead]
+    Dave -- Concept gap surfaces --> MapU[Name it as a U,\nadd to session list]
+    Dave -- Structural claim --> Sketch[Prompt a paper sketch]
+    Dave -- Progress made --> Advance[Probe deeper or\nmove to next item]
+
+    NameVague --> Again{/dave end?}
+    Withhold --> Again
+    MapU --> Again
+    Sketch --> Again
+    Advance --> Again
+
+    Again -- No --> Turn
+    Again -- Yes --> Close([→ /dave end])
+```
 
 ### File structure
 
