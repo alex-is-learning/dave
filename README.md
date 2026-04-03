@@ -58,23 +58,23 @@ Dave is installed as a Claude Code skill at `~/.claude/skills/dave/`. Each topic
 
 ```mermaid
 flowchart TD
-    Start([Start new topic]) --> Init[/dave init]
+    Start([Start new topic]) --> Init["/dave init"]
     Init --> I1[Onboarding interview\n& ZPD calibration]
     I1 --> I2[Primer generated]
     I2 --> Hello
 
-    Hello[/dave hello] --> H1[Load log · primer · git diff]
+    Hello["/dave hello"] --> H1[Load log · primer · git diff]
     H1 --> H2{Unclosed\nsession?}
     H2 -- Yes --> H3[Log as incomplete\non homepage]
     H3 --> H4
     H2 -- No --> H4[Session contract\n& action menu]
     H4 --> Grapple
 
-    Grapple[Grapple] --> S1{/dave end?}
-    S1 -- Bail --> S2[Detected next\n/dave hello]
+    Grapple[Grapple] --> S1{"/dave end?"}
+    S1 -- Bail --> S2["Detected next\n/dave hello"]
     S2 --> Hello
 
-    S1 -- Yes --> End[/dave end]
+    S1 -- Yes --> End["/dave end"]
     End --> E1[A/B/U reflection\n& pride score]
     E1 --> E2[Log + homepage updated]
     E2 --> E3{Another\nsession?}
